@@ -6,6 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -28,6 +29,7 @@ public class Application extends javafx.application.Application {
     private Failihaldur haldur = new Failihaldur();
     private final List<String[]> read = haldur.loeAndmed(); //Loeb iga rea listi
     private Konto konto;
+
     private double pikkus = 220; //default mõõdud klikitavate nuppude jaoks
     private double laius=150;
 
@@ -36,8 +38,16 @@ public class Application extends javafx.application.Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
+
+
+        for(String[] elem:read){
+            System.out.println(Arrays.toString(elem));
+        }
+
+
         //layoutid iga vastava stseeni jaoks, nimega viidatud
         BorderPane sisselogiminePane = new BorderPane(); //Sisselogimise ekraani layout
+        BorderPane paroolPane=new BorderPane();
         BorderPane menüüPane = new BorderPane(); //Avaekraani layout
         VBox vasakpoolsedNupud = new VBox(); //Nuppude asetamine üksteisele alla, ja mis asub vasakul pool stseenis
         VBox parempoolsedNupud = new VBox();
@@ -51,14 +61,16 @@ public class Application extends javafx.application.Application {
         HBox rahaArveleNupud = new HBox();
 
         //tekstid vastava stseeni jaoks
-        Label palubSisestust = new Label("Sisestage PIN/Uue konto loomiseks sisestage 'UUS': "); //Sisselogimise ekraani tekst
+        Label palubSisestust = new Label("Sisestage ID kood/Uue konto loomiseks sisestage 'UUS': "); //Sisselogimise ekraani tekst
+        Label palubSisestustparool=new Label("Sisestage parool");
         Label toiming = new Label("Soovitud toimingu tegemiseks vajutage vastavat nuppu");
         Label info = new Label();
         Label kontoJääkInfo = new Label();
         Label kviitungInfo = new Label();
 
         //sisestused iga stseeni jaoks
-        TextField pinSisestus = new TextField("****"); //Siia peaks kasutaja oma PINi sisestama
+        TextField idKoodSisestus = new TextField("ID kood"); //Siia peaks kasutaja oma ID koodi sisestama
+        TextField paroolSisestus = new PasswordField();
         TextField rahaArveltSisestus = new TextField("Summa");
         TextField rahaArveleSisestus = new TextField("Summa");
         TextField uusKontoSisestus = new TextField("Uus nimi");
@@ -66,6 +78,7 @@ public class Application extends javafx.application.Application {
 
         //Stseen iga funktsiooni jaoks
         Scene sisselogimineStseen = new Scene(sisselogiminePane,420,230); //See on sisselogimise stseen, kus kasutaja saab sisse logid
+        Scene paroolSisestusStseen = new Scene(paroolPane,420,230);
         Scene menüüStseen = new Scene(menüüPane,420,230); //See on põhiekraan, kus kasutaja saab teha vajalike toiminguid oma kontoga
         Scene kontoJääkStseen = new Scene(kontoJääkPane,420,230);
         Scene rahaArveleStseen = new Scene(rahaArvelePane,420,230);
@@ -77,6 +90,7 @@ public class Application extends javafx.application.Application {
 
         //Nupud, nende nimed ja suurused
         Button sisesta = new Button("Sisesta"); //PIN koodi sisestamise nupp
+        Button sisestaParool = new Button("Sisesta");
         Button kontoJääk = new Button("Konto jääk"); //kontojäägi väljastamise fun
         Button rahaArvele = new Button("Pane raha arvele"); //raha arvele panemise fun
         Button rahaArvelt = new Button("Võta raha arvelt"); //raha arvelt võtmise fun
@@ -89,6 +103,7 @@ public class Application extends javafx.application.Application {
         Button kviitungTagasi = new Button("Tagasi"); // kviitung stseenist tagasi põhimenüüsse
         Button võta = new Button("Võta"); //nupp raha võtmiseks
         Button lisa = new Button("Lisa"); //nupp raha lisamiseks
+        Button uuskonto = new Button("Sisesta nimi");
 
         kontoJääk.setPrefSize(laius,pikkus);
         rahaArvele.setPrefSize(laius,pikkus);
@@ -104,11 +119,28 @@ public class Application extends javafx.application.Application {
         võta.setPrefSize(laius,pikkus);
         kviitungTagasi.setPrefSize(laius,pikkus);
         sisesta.setPrefSize(420,230);
+        sisestaParool.setPrefSize(420,230);
 
         //lisasin peamised eventid ära
         sisesta.setOnMouseClicked(event -> {
-               primaryStage.setScene(menüüStseen);
-
+            if((!idKoodSisestus.getText().equals("UUS"))){
+                for(String[] elem:read){
+                    if(elem[2].equals(idKoodSisestus.getText())){
+                        konto=new Konto(elem[1],Integer.parseInt(elem[3]),elem[0],elem[2]);
+                        palubSisestust.setText("Sisesta parool: ");
+                        primaryStage.setScene(paroolSisestusStseen);
+                        break;
+                    }
+                    System.out.println("siin");
+                }
+            }else if(idKoodSisestus.getText().equals("UUS")){
+                primaryStage.setScene(uusKontoStseen);
+            }
+        });
+        sisestaParool.setOnMouseClicked(event ->{
+            if((paroolSisestus.getText().equals(konto.getPin()))){
+                primaryStage.setScene(menüüStseen);
+            }
         });
         kontoJääk.setOnMouseClicked(event -> {
             primaryStage.setScene(kontoJääkStseen);
@@ -136,6 +168,11 @@ public class Application extends javafx.application.Application {
             primaryStage.setScene(menüüStseen);
         });
         lõpeta.setOnMouseClicked(event -> {
+            try {
+                haldur.kirjutaAndmed(read);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             primaryStage.close();
         });
         //layoutidele nuppude lisamine, iga layout eraldi
@@ -161,7 +198,10 @@ public class Application extends javafx.application.Application {
 
 
         //elementide paigutus layoutidele
-        sisselogiminePane.setCenter(pinSisestus);
+        paroolPane.setCenter(paroolSisestus);
+        paroolPane.setTop(palubSisestustparool);
+        paroolPane.setBottom(sisestaParool);
+        sisselogiminePane.setCenter(idKoodSisestus);
         sisselogiminePane.setTop(palubSisestust);
         sisselogiminePane.setBottom(sisesta);
         menüüPane.setLeft(vasakpoolsedNupud);
