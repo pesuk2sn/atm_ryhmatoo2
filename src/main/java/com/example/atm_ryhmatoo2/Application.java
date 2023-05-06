@@ -36,26 +36,25 @@ public class Application extends javafx.application.Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-        BorderPane root = new BorderPane();
-        BorderPane root2 = new BorderPane(); //teine ekraani layout, kui kasutaja on sisse loginud
-        VBox vasakpoolsedNupud = new VBox();
+        BorderPane root = new BorderPane(); //Sisselogimise ekraani layout
+        BorderPane root2 = new BorderPane(); //Avaekraani layout
+        VBox vasakpoolsedNupud = new VBox(); //Nuppude asetamine üksteisele alla, ja mis asub vasakul pool stseenis
         VBox parempoolsedNupud = new VBox();
 
-        Label palubSisestust = new Label("Sisestage PIN/Uue konto loomiseks sisestage 'UUS': ");
-        palubSisestust.setText(read.toString());
-        Label test = new Label();
+        Label palubSisestust = new Label("Sisestage PIN/Uue konto loomiseks sisestage 'UUS': "); //Sisselogimise ekraani tekst
         Label toiming = new Label("Soovitud toimingu tegemiseks vajutage vastavat nuppu");
-        TextField sisestus = new TextField("****");
-        Scene avaEkraan = new Scene(root,420,230);
-        Scene peaMenüü = new Scene(root2,420,230);
+        TextField sisestus = new TextField("****"); //Siia peaks kasutaja oma PINi sisestama
+        Scene avaEkraan = new Scene(root,420,230); //See on sisselogimise stseen, kus kasutaja saab sisse logid
+        Scene peaMenüü = new Scene(root2,420,230); //See on põhiekraan, kus kasutaja saab teha vajalike toiminguid oma kontoga
+        Scene kontoJääk =
 
         //Nupud, nende nimed ja suurused
-        Button sisesta = new Button("Sisesta");
-        Button kontoJääk = new Button("Konto jääk");
-        Button rahaArvele = new Button("Pane raha arvele");
-        Button rahaArvelt = new Button("Võta raha arvelt");
-        Button muudaPin = new Button("Muuda PIN koodi");
-        Button kviitung = new Button("Kirjuta kviitung");
+        Button sisesta = new Button("Sisesta"); //PIN koodi sisestamise nupp
+        Button kontoJääk = new Button("Konto jääk"); //kontojäägi väljastamise fun
+        Button rahaArvele = new Button("Pane raha arvele"); //raha arvele panemise fun
+        Button rahaArvelt = new Button("Võta raha arvelt"); //raha arvelt võtmise fun
+        Button muudaPin = new Button("Muuda PIN koodi"); //PINi muutmise fun
+        Button kviitung = new Button("Kirjuta kviitung"); //kviitungi printimise fun
         Button lõpeta = new Button("Lõpeta");
         kontoJääk.setPrefSize(laius,pikkus);
         rahaArvele.setPrefSize(laius,pikkus);
@@ -69,23 +68,19 @@ public class Application extends javafx.application.Application {
         sisesta.setOnMouseClicked(event -> {
            jooksevVäärtus=sisesta.getText();
            konto=kontoAndmed(read,jooksevVäärtus);
-           if (konto==null){
-               palubSisestust.setText("Ei leidnud kontot");
-           }
-           else {
                //test.setText(konto.getIsikukood());
                primaryStage.setScene(peaMenüü);
-           }
 
         });
+        //elementide paigutus layoutidele
         root.setCenter(sisestus);
         root.setTop(palubSisestust);
         root.setBottom(sisesta);
-        root.setLeft(test);
         root2.setLeft(vasakpoolsedNupud);
         root2.setRight(parempoolsedNupud);
         root2.setTop(toiming);
         sisesta.setAlignment(Pos.CENTER);
+
 
         vasakpoolsedNupud.getChildren().add(kontoJääk);
         vasakpoolsedNupud.getChildren().add(rahaArvele);
@@ -95,7 +90,6 @@ public class Application extends javafx.application.Application {
         parempoolsedNupud.getChildren().add(lõpeta);
 
         primaryStage.setScene(avaEkraan);
-        root2.getChildren().addAll(test);
         primaryStage.setTitle("ATM");
         primaryStage.show();
     }
