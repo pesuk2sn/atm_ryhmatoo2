@@ -24,11 +24,11 @@ public class Application extends javafx.application.Application {
     private String jooksevVäärtus = null;
     private int kontojääk = 0;
     private String nimi=null;
-    private String isikukood=null;
+    private String isikukood;
     private Failihaldur haldur = new Failihaldur();
-    List<String[]> read = haldur.loeAndmed(); //Loeb iga rea listi
-    private Konto konto = kontoAndmed(read,jooksevVäärtus);
-    private double pikkus = 220;
+    private final List<String[]> read = haldur.loeAndmed(); //Loeb iga rea listi
+    private Konto konto;
+    private double pikkus = 220; //default mõõdud klikitavate nuppude jaoks
     private double laius=150;
 
     public Application() throws FileNotFoundException {
@@ -36,18 +36,20 @@ public class Application extends javafx.application.Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-
         BorderPane root = new BorderPane();
-        BorderPane root2 = new BorderPane();
+        BorderPane root2 = new BorderPane(); //teine ekraani layout, kui kasutaja on sisse loginud
         VBox vasakpoolsedNupud = new VBox();
         VBox parempoolsedNupud = new VBox();
+
         Label palubSisestust = new Label("Sisestage PIN/Uue konto loomiseks sisestage 'UUS': ");
-        Label teineEkraan = new Label("See on teine ekraan");
-        Label test = new Label("test");
+        palubSisestust.setText(read.toString());
+        Label test = new Label();
         Label toiming = new Label("Soovitud toimingu tegemiseks vajutage vastavat nuppu");
         TextField sisestus = new TextField("****");
-        Scene esiEkraan = new Scene(root,420,230);
-        Scene peaEkraan = new Scene(root2,420,230);
+        Scene avaEkraan = new Scene(root,420,230);
+        Scene peaMenüü = new Scene(root2,420,230);
+
+        //Nupud, nende nimed ja suurused
         Button sisesta = new Button("Sisesta");
         Button kontoJääk = new Button("Konto jääk");
         Button rahaArvele = new Button("Pane raha arvele");
@@ -65,14 +67,21 @@ public class Application extends javafx.application.Application {
 
         sisesta.setPrefSize(420,230);
         sisesta.setOnMouseClicked(event -> {
-            jooksevVäärtus=sisesta.getText();
-            if (sisestus.getText().equals("1234")){
-                primaryStage.setScene(peaEkraan);
-            }
+           jooksevVäärtus=sisesta.getText();
+           konto=kontoAndmed(read,jooksevVäärtus);
+           if (konto==null){
+               palubSisestust.setText("Ei leidnud kontot");
+           }
+           else {
+               //test.setText(konto.getIsikukood());
+               primaryStage.setScene(peaMenüü);
+           }
+
         });
         root.setCenter(sisestus);
         root.setTop(palubSisestust);
         root.setBottom(sisesta);
+        root.setLeft(test);
         root2.setLeft(vasakpoolsedNupud);
         root2.setRight(parempoolsedNupud);
         root2.setTop(toiming);
@@ -85,14 +94,16 @@ public class Application extends javafx.application.Application {
         parempoolsedNupud.getChildren().add(kviitung);
         parempoolsedNupud.getChildren().add(lõpeta);
 
-        primaryStage.setScene(esiEkraan);
+        primaryStage.setScene(avaEkraan);
         root2.getChildren().addAll(test);
         primaryStage.setTitle("ATM");
         primaryStage.show();
     }
+    //Konto andmete sisse lugemine
     public Konto kontoAndmed(List<String[]> elem, String pin) {
         Konto konto = null;
         for (String[] strings : read) {
+            System.out.println(strings[0]);
             if (strings[0].equals(pin)) {
                 kontojääk = Integer.parseInt(strings[3]);
                 nimi = strings[1];
