@@ -46,7 +46,6 @@ public class Application extends javafx.application.Application {
         TextField sisestus = new TextField("****"); //Siia peaks kasutaja oma PINi sisestama
         Scene avaEkraan = new Scene(root,420,230); //See on sisselogimise stseen, kus kasutaja saab sisse logid
         Scene peaMenüü = new Scene(root2,420,230); //See on põhiekraan, kus kasutaja saab teha vajalike toiminguid oma kontoga
-        Scene kontoJääk =
 
         //Nupud, nende nimed ja suurused
         Button sisesta = new Button("Sisesta"); //PIN koodi sisestamise nupp
