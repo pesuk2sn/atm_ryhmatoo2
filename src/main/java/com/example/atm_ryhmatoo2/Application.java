@@ -17,7 +17,9 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -28,7 +30,7 @@ public class Application extends javafx.application.Application {
     private String nimi=null;
     private String isikukood;
     private Failihaldur haldur = new Failihaldur();
-    private final List<String[]> read = haldur.loeAndmed(); //Loeb iga rea listi
+    private List<String[]> read = haldur.loeAndmed(); //Loeb iga rea listi
     private Konto konto;
 
     private double nupuPikkus = 20; //default mõõdud klikitavate nuppude jaoks
@@ -82,7 +84,9 @@ public class Application extends javafx.application.Application {
         TextField paroolSisestus = new PasswordField();
         TextField rahaArveltSisestus = new TextField("Summa");
         TextField rahaArveleSisestus = new TextField("Summa");
-        TextField uusKontoSisestus = new TextField("Uus nimi");
+        TextField uusKontoNimi = new TextField("Uus nimi");
+        TextField uusKontoIDkood=new TextField("Teie id kood");
+        TextField uusKontoParool=new TextField("Teie parool");
         TextField uusParoolSisestus = new TextField("Uus parool");
 
         //Stseen iga funktsiooni jaoks
@@ -112,7 +116,8 @@ public class Application extends javafx.application.Application {
         Button kviitungTagasi = new Button("Tagasi"); // kviitung stseenist tagasi põhimenüüsse
         Button võta = new Button("Võta"); //nupp raha võtmiseks
         Button lisa = new Button("Lisa"); //nupp raha lisamiseks
-        Button uuskonto = new Button("Sisesta nimi");
+        Button uuskonto = new Button("Sisesta nimi, id kood ja salasõna");
+        Button sisestaAndmed=new Button("Kinnita andmed");
 
         kontoJääk.setPrefSize(nupuLaius,nupuPikkus);
         rahaArvele.setPrefSize(nupuLaius,nupuPikkus);
@@ -142,10 +147,30 @@ public class Application extends javafx.application.Application {
                         primaryStage.setScene(paroolSisestusStseen);
                         break;
                     }
-                    System.out.println("siin");
                 }
             }else if(idKoodSisestus.getText().equals("UUS")){
                 primaryStage.setScene(uusKontoStseen);
+            }
+        });
+        sisestaAndmed.setOnMouseClicked(event ->{
+            System.out.println("siin");
+            for(String[] elem:read){
+                if(uusKontoIDkood.getText()==elem[2]){
+                    primaryStage.setScene(sisselogimineStseen);
+                    palubSisestust.setText("ID kood juba eksisteerib, logi sisse");
+                    return;
+                }
+            }
+            Konto konto = new Konto(uusKontoNimi.getText(),0,uusKontoParool.getText(),uusKontoIDkood.getText());
+            try{
+                haldur.looKonto(konto.getPin(),konto.getNimi(),konto.getIsikukood(),Integer.toString(konto.getKontoJääk()));
+                read=haldur.loeAndmed();
+                primaryStage.setScene(sisselogimineStseen);
+                palubSisestust.setText("Sisestage ID kood/Uue konto loomiseks sisestage 'UUS': ");
+            }catch(IOException e){
+                System.out.println(e.getMessage());
+                primaryStage.setScene(sisselogimineStseen);
+                palubSisestust.setText("Tekkis viga konto loomisega");
             }
         });
         sisestaParool.setOnMouseClicked(event ->{
@@ -168,18 +193,54 @@ public class Application extends javafx.application.Application {
         });
         kviitung.setOnMouseClicked(event -> {
             primaryStage.setScene(kviitungStseen);
-            kviitungInfo.setText("Kviitung on trükitud!");
+            try{
+                FileWriter failiKirjutaja = new FileWriter("kviitung.txt");
+                int kviitungiNumber = (int)(Math.random()*((9999-1000)+1))+1000;
+                failiKirjutaja.write("Kviitungi nr: "+ kviitungiNumber +", kliendi nimi: "+konto.getNimi()+", kuupäev: " + LocalDate.now());
+                failiKirjutaja.close();
+                kviitungInfo.setText("Kviitung on trükitud!");
+            }catch(IOException e){
+                kviitungInfo.setText("Kviitungi kirjutamine ebaõnnestus");
+            }
         });
         rahaArveleTagasi.setOnMouseClicked(event -> {
+            rahaArveleSisestus.setText("Summa");
             primaryStage.setScene(menüüStseen);
+
+        });
+        võta.setOnMouseClicked(event -> {
+            if (konto.getKontoJääk() >= Integer.parseInt(rahaArveltSisestus.getText())){
+                konto.võtaRahaArvelt(Integer.parseInt(rahaArveltSisestus.getText()));
+                rahaArveltPane.setTop(new Label("Palju tahad välja võtta?"));
+                primaryStage.setScene(menüüStseen);
+                rahaArveltSisestus.setText("Summa");
+            }else{
+                rahaArveltPane.setTop(new Label("Pole piisavalt raha"));
+            }
+
+        });
+        lisa.setOnMouseClicked(event->{
+            konto.kannaRahaArvele(Integer.parseInt(rahaArveleSisestus.getText()));
+            rahaArvelePane.setTop(new Label("Sisesta raha"));
+            primaryStage.setScene(menüüStseen);
+            rahaArveleSisestus.setText("Summa");
         });
         rahaArveltTagasi.setOnMouseClicked(event -> {
+            rahaArveltSisestus.setText("Summa");
+            rahaArveltPane.setTop(new Label("Sisesta raha"));
             primaryStage.setScene(menüüStseen);
         });
         kontoJääkTagasi.setOnMouseClicked(event -> {
             primaryStage.setScene(menüüStseen);
         });
         lõpeta.setOnMouseClicked(event -> {
+            for (String[] elem : read) {
+                if (elem[2].equals(konto.getIsikukood())) {
+                    elem[3]=Integer.toString(konto.getKontoJääk());
+                    read.set(read.indexOf(elem), elem);
+                    break;
+                }
+            }
             try {
                 haldur.kirjutaAndmed(read);
             } catch (IOException e) {
@@ -188,8 +249,11 @@ public class Application extends javafx.application.Application {
             primaryStage.close();
         });
         //layoutidele nuppude lisamine, iga layout eraldi
-        uusKontoPane.getChildren().add(uusKontoSisestus);
-        uusKontoPane.getChildren().add(sisestaID);
+        uusKontoPane.getChildren().add(uusKontoNimi);
+        uusKontoPane.getChildren().add(uusKontoIDkood);
+        uusKontoPane.getChildren().add(uusKontoParool);
+
+        uusKontoPane.getChildren().add(sisestaAndmed);
 
 
         //elementide paigutus layoutidele
@@ -208,6 +272,7 @@ public class Application extends javafx.application.Application {
         rahaArvelePane.setCenter(rahaArveleSisestus);
         rahaArvelePane.setBottom(rahaArveleNupud);
 
+        rahaArveltPane.setTop(new Label("Palju tahad välja võtta?"));
         rahaArveltPane.setCenter(rahaArveltSisestus);
         rahaArveltPane.setBottom(rahaArveltNupud);
 
