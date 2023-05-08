@@ -165,9 +165,8 @@ public class Application extends javafx.application.Application {
             }
         });
         sisestaAndmed.setOnMouseClicked(event ->{
-            System.out.println("siin");
-            for(String[] elem:read){
-                if(uusKontoIDkood.getText()==elem[2]){
+            for(String[] elem:read) {
+                if (uusKontoIDkood.getText().equals(elem[2])) {
                     primaryStage.setScene(sisselogimineStseen);
                     palubSisestust.setText("ID kood juba eksisteerib, logi sisse");
                     return;
@@ -227,6 +226,13 @@ public class Application extends javafx.application.Application {
         muuda.setOnMouseClicked(event -> {
             if (vanaPinSisestus.getText().equals(konto.getPin())&&uusPinSisestus1.getText().equals(uusPinSisestus2.getText())){
                 konto.setPin(uusPinSisestus1.getText());
+                for (String[] elem : read) {
+                    if (elem[2].equals(konto.getIsikukood())) {
+                        elem[0]=konto.getPin();
+                        read.set(read.indexOf(elem), elem);
+                        break;
+                    }
+                }
                 primaryStage.setScene(menüüStseen);
                 menüüPane.setCenter(new Label("PIN muudetud"));
             }
