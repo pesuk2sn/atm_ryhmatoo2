@@ -24,7 +24,7 @@ Teine etapp oli kõikvõimalike veaohtlike kohtade otsimine, mida kasutaja teha 
 Kolmas etapp oli programmi rohkem kasutajasõbralikumaks muutmine.
 
 
-Rühmaliikmete panus: Eelmisest rühmatööst tegin Joonas failihalduri klassi, Robert konto klassi. Selles rühmatöös Joonas kasutas failihalduri klassi, et andmed sisse lugeda tekstist. Samuti lõi Joonas igale nupule
+Rühmaliikmete panus: Eelmisest rühmatööst tegi Joonas failihalduri klassi, Robert konto klassi. Selles rühmatöös Joonas kasutas failihalduri klassi, et andmed sisse lugeda tekstist. Samuti lõi Joonas igale nupule
 vastava algoritmi ja vajadusel erindi. Kokku läks Joonasel töö tegemiseks umbes 6h.
 Robert tegeles peamisel graafiliste elementide loomisega, stseenide loomisega, paigutusega, suurustega ja tekstiga. Osade nuppude funktsioonalsuste tegemisel toetas Joonas. 
 Kokku läks Robertil töö tegemiseks umbes 6h
