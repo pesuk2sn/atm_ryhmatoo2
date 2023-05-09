@@ -25,9 +25,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Application extends javafx.application.Application {
-    private int kontojääk = 0;
-    private String nimi=null;
-    private String isikukood;
+
     private Failihaldur haldur = new Failihaldur();
     private List<String[]> read = haldur.loeAndmed(); //Loeb iga rea listi
     private Konto konto;
@@ -37,9 +35,6 @@ public class Application extends javafx.application.Application {
     private double stseeniPikkus=170;
     private double stseeniLaius =330;
 
-
-    public Application() throws FileNotFoundException {
-    }
 
     @Override
     public void start(Stage primaryStage) throws IOException {
@@ -173,8 +168,10 @@ public class Application extends javafx.application.Application {
         paroolElemendid.getChildren().addAll(new Label("Sisesta parool"),paroolSisestus,sisestaParool);
         paroolPane.setCenter(paroolElemendid);
 
-        vasakpoolsedNupud.setSpacing(5);
-        parempoolsedNupud.setSpacing(5);
+        vasakpoolsedNupud.setSpacing(15);
+        parempoolsedNupud.setSpacing(15);
+        vasakpoolsedNupud.setAlignment(Pos.CENTER);
+        parempoolsedNupud.setAlignment(Pos.CENTER);
         vasakpoolsedNupud.getChildren().addAll(kontoJääk,rahaArvele,rahaArvelt);
         parempoolsedNupud.getChildren().addAll(muudaParool,kviitung,lõpeta);
         menüüPane.setPadding(new Insets(5,5,5,5));
@@ -290,7 +287,6 @@ public class Application extends javafx.application.Application {
             }
         });
         rahaArveleTagasi.setOnMouseClicked(event -> {
-            rahaArveleSisestus.setText("Summa");
             primaryStage.setScene(menüüStseen);
 
         });
@@ -331,13 +327,10 @@ public class Application extends javafx.application.Application {
         });
         lisa.setOnMouseClicked(event->{
             konto.kannaRahaArvele(Integer.parseInt(rahaArveleSisestus.getText()));
-            rahaArvelePane.setTop(new Label("Sisesta raha"));
             primaryStage.setScene(menüüStseen);
             menüüPane.setCenter(new Label("Raha arvele lisatud"));
         });
         rahaArveltTagasi.setOnMouseClicked(event -> {
-            rahaArveltSisestus.setText("Summa");
-            rahaArveltPane.setTop(new Label("Sisesta raha"));
             primaryStage.setScene(menüüStseen);
         });
         kontoJääkTagasi.setOnMouseClicked(event -> {

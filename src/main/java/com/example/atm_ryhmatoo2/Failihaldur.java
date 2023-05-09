@@ -15,8 +15,7 @@ public class Failihaldur {
     private String failitee= "kontod.txt";//failitee andmine, alati sama
     private String tahestik1="QWERTYUIOP{}ASDFGH JKL:ZXCVBNM<>?qwertyuiop[]asdfghjkl'zxcvbnm,./üõöäÜÕÖÄ1234567890!@#$%^&*()_+-=";//kaks tähestikku krüpteerimiseks ja dekrüpteerimiseks
     private String tahestik2=" {}ASDFGHJKL:ZXCVBNM<>?QWERTYUIOP]asdfghjklqwertyuiop[/üõöäÜÕÖÄ1234567890'zxcvbnm,.!@#$%^&*()_+-=";
-    public void Failihaldur(){
-    }
+
     //Password,Ees ja perenimi,idkood,rahasumma,krypteerimisnr
     public List<String[]> loeAndmed() {
         File fail=new File(failitee);
